@@ -18,3 +18,5 @@ pytest --html=report.html --self-contained-html
 
 Open the generated report.html file in a web browser to view the detailed test results.
 This setup ensures the data processing and counting functionalities are thoroughly tested and verified.
+
+Addtionally find the two postman files.
