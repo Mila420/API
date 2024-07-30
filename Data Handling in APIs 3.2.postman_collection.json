@@ -1,0 +1,193 @@
+{
+	"info": {
+		"_postman_id": "317f1a7a-3e9c-4be5-9f8d-e0a818aec67a",
+		"name": "Data Handling in APIs 3.2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37300146"
+	},
+	"item": [
+		{
+			"name": "Find",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parsear la respuesta JSON\r",
+							"let responseData = pm.response.json();\r",
+							"\r",
+							"// Verificar si la respuesta contiene un array de mascotas\r",
+							"pm.test(\"La respuesta contiene un array de mascotas\", function() {\r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"});\r",
+							"\r",
+							"// Array para almacenar las tuplas (id, nombre)\r",
+							"let soldPetTuples = [];\r",
+							"\r",
+							"// Iterar sobre cada mascota en los datos de respuesta\r",
+							"responseData.forEach(pet => {\r",
+							"    // Extraer id y nombre, luego almacenar como una tupla\r",
+							"    if (pet.id && pet.name) {\r",
+							"        soldPetTuples.push({ id: pet.id, name: pet.name });\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"// Registrar las tuplas en la consola para su visualización\r",
+							"console.log(soldPetTuples);\r",
+							"\r",
+							"// Opcional: guardar las tuplas como una variable de entorno\r",
+							"pm.environment.set('soldPetTuples', JSON.stringify(soldPetTuples));\r",
+							"\r",
+							"var template = `\r",
+							"<table class=\"tftable\" border=\"1\">\r",
+							"    <tr>\r",
+							"        <th>ID</th>\r",
+							"        <th>Name</th>\r",
+							"    </tr>\r",
+							"\r",
+							"    {{#each response}}\r",
+							"        <tr id=row_{{@key}}>\r",
+							"            <td>{{id}}</td>\r",
+							"            <td>{{name}}</td>\r",
+							"        </tr>\r",
+							"    {{/each}}\r",
+							"</table>\r",
+							"`;\r",
+							"\r",
+							"function constructVisualizerPayload() {\r",
+							"    return {response: responseData}\r",
+							"}\r",
+							"\r",
+							"pm.visualizer.set(template, constructVisualizerPayload());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://petstore.swagger.io/v2/pet/findByStatus?status=sold",
+					"protocol": "https",
+					"host": [
+						"petstore",
+						"swagger",
+						"io"
+					],
+					"path": [
+						"v2",
+						"pet",
+						"findByStatus"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "sold"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Count",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Definición de la clase PetCounter\r",
+							"class PetCounter {\r",
+							"    constructor(pets) {\r",
+							"        this.pets = pets;\r",
+							"    }\r",
+							"\r",
+							"    countPetsByName() {\r",
+							"        // Diccionario para almacenar los conteos de nombres\r",
+							"        let nameCount = {};\r",
+							"        this.pets.forEach(pet => {\r",
+							"            if (pet.name) {\r",
+							"                let name = pet.name;\r",
+							"                // Incrementar el conteo del nombre\r",
+							"                if (nameCount[name]) {\r",
+							"                    nameCount[name] += 1;\r",
+							"                } else {\r",
+							"                    nameCount[name] = 1;\r",
+							"                }\r",
+							"            }\r",
+							"        });\r",
+							"        return nameCount;\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"// Obtener los datos de mascotas de la respuesta (asumiendo que se almacenaron previamente)\r",
+							"let pets = JSON.parse(pm.environment.get('soldPetTuples'));\r",
+							"\r",
+							"// Instanciar la clase PetCounter\r",
+							"let counter = new PetCounter(pets);\r",
+							"\r",
+							"// Contar cuántas mascotas tienen el mismo nombre\r",
+							"let nameCounts = counter.countPetsByName();\r",
+							"\r",
+							"// Mostrar los resultados en la consola\r",
+							"console.log(nameCounts);\r",
+							"\r",
+							"// Guardar el resultado como una variable de entorno, si es necesario\r",
+							"pm.environment.set('nameCounts', JSON.stringify(nameCounts));\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://petstore.swagger.io/v2/pet/findByStatus?status=sold",
+					"protocol": "https",
+					"host": [
+						"petstore",
+						"swagger",
+						"io"
+					],
+					"path": [
+						"v2",
+						"pet",
+						"findByStatus"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "sold"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
